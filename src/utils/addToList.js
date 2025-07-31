@@ -1,5 +1,3 @@
-// src/utils/addToList.js
-
 export const getSavedItems = (type) => {
   const saved = localStorage.getItem(`saved${type}`);
   return saved ? JSON.parse(saved) : [];
@@ -7,7 +5,7 @@ export const getSavedItems = (type) => {
 
 export const isItemSaved = (type, id) => {
   const saved = getSavedItems(type);
-  return saved.some(item => item.id === id);
+  return saved.some(item => String(item.id) === String(id)); // normalize ID
 };
 
 export const saveItem = (type, item) => {
@@ -15,25 +13,24 @@ export const saveItem = (type, item) => {
 
   console.log("📦 Raw item before processing:", item);
 
-  // Flexible title handling (TMDb or capitalized)
   const title =
     item.title ||
     item.name ||
     item.original_title ||
     item.original_name ||
-    item.Title || // fallback for capitalized
+    item.Title || // capitalized fallback
+    item.book_title || // Open Library
     'Untitled';
 
-  // Flexible image handling
   const image =
     (item.poster_path && `https://image.tmdb.org/t/p/w500${item.poster_path}`) ||
     item.background_image ||
-    item.image?.original ||
     item.cover ||
-    item.Poster || // fallback for capitalized
+    item.image?.original ||
+    item.Poster || // OMDb/other
+    (item.cover_i && `https://covers.openlibrary.org/b/id/${item.cover_i}-L.jpg`) || // Open Library
     null;
 
-  // Flexible rating handling
   const rating =
     item.vote_average ||
     item.rating ||
@@ -44,7 +41,7 @@ export const saveItem = (type, item) => {
     null;
 
   const minimalItem = {
-    id: item.id,
+    id: item.id || item.key || item.imdbID || item.cover_i || `${title}`, // fallback if no ID
     title,
     rating,
     image,
@@ -59,6 +56,6 @@ export const saveItem = (type, item) => {
 };
 
 export const removeItem = (type, id) => {
-  const saved = getSavedItems(type).filter(item => item.id !== id);
+  const saved = getSavedItems(type).filter(item => String(item.id) !== String(id));
   localStorage.setItem(`saved${type}`, JSON.stringify(saved));
 };
