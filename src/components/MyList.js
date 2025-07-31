@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { getSavedItems } from '../utils/addToList';
 import AddToListButton from './AddToListButton';
+import ReviewForm from './ReviewForm';
+import { useNavigate } from 'react-router-dom';
 
 const MyList = () => {
   const [items, setItems] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const allTypes = ['Movies', 'Books', 'Games', 'Shows'];
     const allItems = allTypes.flatMap(type =>
       getSavedItems(type).map(item => {
         const fullItem = { ...item, type };
-        console.log("📂 Loaded item from localStorage:", fullItem); // Debug log
         return fullItem;
       })
     );
@@ -20,6 +22,14 @@ const MyList = () => {
   return (
     <div className="app">
       <h1>🎬📚🎮📺 My List</h1>
+
+      <div style={{ marginBottom: '20px' }}>
+        <button onClick={() => navigate('/create-list')}>➕ Create Custom List</button>
+        <button onClick={() => navigate('/view-lists')} style={{ marginLeft: '10px' }}>
+          📂 View My Lists
+        </button>
+      </div>
+
       <div className="book-list">
         {items.length === 0 ? (
           <p>No items added yet.</p>
@@ -43,6 +53,7 @@ const MyList = () => {
                   : item.rating?.average ?? 'N/A'}
               </p>
               <AddToListButton type={item.type} item={item} />
+              <ReviewForm type={item.type} itemId={item.id} />
             </div>
           ))
         )}

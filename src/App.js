@@ -5,6 +5,8 @@ import Games from './components/Games';
 import Movies from './components/Movies';
 import Shows from './components/Shows';
 import MyList from './components/MyList';
+import CustomListCreator from './components/CustomListCreator';
+import CustomListViewer from './components/CustomListViewer';
 import './App.css';
 
 
@@ -22,6 +24,8 @@ function App() {
           <Route path="/movies" element={<Movies />} />
           <Route path="/shows" element={<Shows />} />
           <Route path="/mylist" element={<MyList />} />
+          <Route path="/create-list" element={<CustomListCreator />} />
+          <Route path="/view-lists" element={<CustomListViewer />} />
         </Routes>
       </div>
     </Router>
