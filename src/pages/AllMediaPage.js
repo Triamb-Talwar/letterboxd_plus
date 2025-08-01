@@ -9,7 +9,7 @@ import { saveItem as addToList } from '../utils/addToList';
 
 const AllMediaPage = () => {
   const [results, setResults] = useState([]);
-  const [mediaType, setMediaType] = useState('Movies');
+  const [setMediaType] = useState('Movies');
   const navigate = useNavigate();
 
   const handleSearch = async (type, query) => {
