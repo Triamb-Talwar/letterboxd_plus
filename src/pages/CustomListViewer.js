@@ -1,7 +1,6 @@
-// src/pages/CustomListViewer.js
-
 import React, { useState, useEffect } from 'react';
 import { getReview, getRating, saveReview, saveRating } from '../utils/reviews';
+import { searchMedia } from '../utils/mediaFetcher';
 
 const CustomListViewer = () => {
   const [savedLists, setSavedLists] = useState({});
@@ -10,6 +9,10 @@ const CustomListViewer = () => {
   const [reviewInputs, setReviewInputs] = useState({});
   const [ratingInputs, setRatingInputs] = useState({});
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [mediaType, setMediaType] = useState('Movies');
+  const [searchResults, setSearchResults] = useState([]);
+
   useEffect(() => {
     const lists = JSON.parse(localStorage.getItem('customLists') || '{}');
     setSavedLists(lists);
@@ -17,7 +20,7 @@ const CustomListViewer = () => {
 
   const handleSelectList = (listName) => {
     setSelectedList(listName);
-    setEditingItemId(null); // reset editing
+    setEditingItemId(null);
   };
 
   const handleDelete = (listName) => {
@@ -39,6 +42,34 @@ const CustomListViewer = () => {
     saveReview(itemId, reviewInputs[itemId]);
     saveRating(itemId, ratingInputs[itemId]);
     setEditingItemId(null);
+  };
+
+  const handleSearch = async () => {
+    const results = await searchMedia(mediaType, searchQuery);
+    setSearchResults(results);
+  };
+
+  const handleAddToList = (item) => {
+    const updated = {
+      ...savedLists,
+      [selectedList]: [...savedLists[selectedList], {
+        id: item.id,
+        title: item.title,
+        image: item.image || null,
+        type: mediaType,
+      }]
+    };
+    setSavedLists(updated);
+    localStorage.setItem('customLists', JSON.stringify(updated));
+  };
+
+  const handleRemoveFromList = (id) => {
+    const updated = {
+      ...savedLists,
+      [selectedList]: savedLists[selectedList].filter((i) => i.id !== id)
+    };
+    setSavedLists(updated);
+    localStorage.setItem('customLists', JSON.stringify(updated));
   };
 
   const renderStars = (rating) => {
@@ -69,10 +100,14 @@ const CustomListViewer = () => {
                 <br />
                 <small>{savedLists[name].length} items</small>
                 <br />
-                <button onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(name);
-                }}>Delete</button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(name);
+                  }}
+                >
+                  Delete
+                </button>
               </div>
             ))}
           </div>
@@ -81,6 +116,7 @@ const CustomListViewer = () => {
             <>
               <hr />
               <h3>Items in "{selectedList}"</h3>
+
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
                 {savedLists[selectedList].map((item) => {
                   const currentReview = getReview(item.id);
@@ -140,6 +176,64 @@ const CustomListViewer = () => {
                           <p><strong>Rating:</strong> {renderStars(currentRating)}</p>
                           <button onClick={() => handleEdit(item.id)}>Edit Review</button>
                         </>
+                      )}
+
+                      <button
+                        onClick={() => handleRemoveFromList(item.id)}
+                        style={{ marginTop: '5px', background: '#ffd4d4' }}
+                      >
+                        Remove from this list
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <hr />
+              <h3>Add or Remove Media</h3>
+
+              <div>
+                <select value={mediaType} onChange={(e) => setMediaType(e.target.value)}>
+                  <option>Movies</option>
+                  <option>Shows</option>
+                  <option>Books</option>
+                  <option>Games</option>
+                </select>
+
+                <input
+                  type="text"
+                  placeholder={`Search ${mediaType}`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ margin: '0 10px' }}
+                />
+                <button onClick={handleSearch}>Search</button>
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '20px' }}>
+                {searchResults.map((item) => {
+                  const alreadyInList = savedLists[selectedList]?.some((x) => x.id === item.id);
+                  return (
+                    <div
+                      key={item.id}
+                      style={{
+                        border: '1px solid #ccc',
+                        padding: '10px',
+                        width: '150px',
+                        textAlign: 'center',
+                        backgroundColor: alreadyInList ? '#eaffea' : '#fff',
+                      }}
+                    >
+                      {item.image ? (
+                        <img src={item.image} alt={item.title} style={{ width: '100%' }} />
+                      ) : (
+                        <div>No Image</div>
+                      )}
+                      <h4 style={{ fontSize: '14px' }}>{item.title}</h4>
+                      {alreadyInList ? (
+                        <button onClick={() => handleRemoveFromList(item.id)}>Remove</button>
+                      ) : (
+                        <button onClick={() => handleAddToList(item)}>Add</button>
                       )}
                     </div>
                   );

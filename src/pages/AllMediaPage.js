@@ -32,7 +32,7 @@ const AllMediaPage = () => {
         <button onClick={() => navigate('/create-list')} style={{ marginRight: '10px' }}>
           Create New List
         </button>
-        <button onClick={() => navigate('/view-list')}>
+        <button onClick={() => navigate('/custom-lists')}>
           View My Lists
         </button>
       </div>
