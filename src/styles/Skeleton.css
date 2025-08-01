@@ -1,0 +1,33 @@
+/* src/styles/Skeleton.css */
+
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Card-style skeleton */
+.skeleton-card {
+  height: 150px;
+  width: 100%;
+  margin: 12px 0;
+}
+
+/* Review box skeleton */
+.skeleton-review {
+  height: 80px;
+  width: 100%;
+  margin: 12px 0;
+}

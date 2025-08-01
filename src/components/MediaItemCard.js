@@ -2,17 +2,26 @@
 import React, { useState, useEffect } from 'react';
 import ReviewForm from './ReviewForm';
 import { getReview } from '../utils/reviews';
+import SkeletonReview from './SkeletonReview'; // ← import the skeleton
 import '../App.css';
+import '../styles/MediaItemCard.css';
 
 const MediaItemCard = ({ item }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [savedReview, setSavedReview] = useState('');
+  const [loadingReview, setLoadingReview] = useState(true); // ← new
 
   useEffect(() => {
-    const review = getReview(item.id);
-    if (review) {
-      setSavedReview(review);
-    }
+    const fetchReview = () => {
+      const review = getReview(item.id);
+      if (review) {
+        setSavedReview(review);
+      }
+      setLoadingReview(false); // ← done loading
+    };
+
+    // Simulate async delay (optional but realistic UX)
+    setTimeout(fetchReview, 400); // 400ms fake delay
   }, [item.id]);
 
   const handleReviewSubmit = () => {
@@ -31,12 +40,14 @@ const MediaItemCard = ({ item }) => {
 
       <h3>{item.title}</h3>
 
-      {savedReview && (
+      {loadingReview ? (
+        <SkeletonReview />
+      ) : savedReview ? (
         <div className="saved-review">
           <strong>Your Review:</strong>
           <p>{savedReview}</p>
         </div>
-      )}
+      ) : null}
 
       <button onClick={() => setShowReviewForm(!showReviewForm)}>
         {showReviewForm ? 'Cancel' : savedReview ? 'Edit Review' : 'Add Review'}

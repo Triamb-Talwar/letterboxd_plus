@@ -1,0 +1,15 @@
+/* src/styles/AllMediaPage.css */
+
+.app {
+  padding: 32px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.app .navigation-buttons {
+  margin-bottom: 24px;
+}
+
+.app .navigation-buttons button {
+  margin-right: 12px;
+}

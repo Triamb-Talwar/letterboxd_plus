@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
+import '../styles/AuthPages.css';
 
 const SignupPage = () => {
   const [email, setEmail] = useState('');
@@ -22,7 +23,7 @@ const SignupPage = () => {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="auth-container">
       <h2>Signup</h2>
       <form onSubmit={handleSignup}>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required /><br />

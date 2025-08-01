@@ -2,6 +2,7 @@
 
 import React from 'react';
 import MediaItemCard from './MediaItemCard';
+import '../styles/MediaGrid.css';
 
 const MediaGrid = ({ items, onAdd }) => {
   return (

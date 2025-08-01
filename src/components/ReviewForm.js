@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { saveReview, getReview, saveRating, getRating } from '../utils/reviews';
+import '../styles/ReviewForm.css';
 
 const ReviewForm = ({ itemId }) => {
   const [text, setText] = useState('');

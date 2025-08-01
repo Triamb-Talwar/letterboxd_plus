@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import '../styles/AuthPages.css';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -33,7 +34,7 @@ const LoginPage = () => {
 };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="auth-container">
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required /><br />

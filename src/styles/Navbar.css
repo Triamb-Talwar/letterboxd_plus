@@ -1,0 +1,30 @@
+/* src/styles/Navbar.css */
+
+nav {
+  background-color: white;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1rem;
+}
+
+nav a {
+  color: #1A1A1A;
+  text-decoration: none;
+  margin-right: 16px;
+  font-weight: 500;
+}
+
+nav a:hover {
+  color: #3B82F6;
+}
+
+nav span {
+  font-weight: 500;
+}
+
+nav button {
+  margin-left: 12px;
+}
