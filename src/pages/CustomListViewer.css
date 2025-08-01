@@ -1,0 +1,31 @@
+.custom-list-viewer {
+  padding: 1rem;
+  text-align: center;
+}
+
+.media-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.media-card {
+  width: 160px;
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+}
+
+.media-image {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.review {
+  font-style: italic;
+  color: #333;
+  margin-top: 0.5rem;
+}

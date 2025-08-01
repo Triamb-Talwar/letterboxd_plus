@@ -1,0 +1,25 @@
+.custom-list-form {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.custom-list-form input,
+.custom-list-form select {
+  margin: 0.5rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.custom-list-form button {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.create-msg {
+  margin-top: 1rem;
+  font-weight: bold;
+  color: green;
+}

@@ -1,30 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { saveReview, getReview, saveRating, getRating } from '../utils/reviews';
 
-const ReviewForm = ({ onSave, existingReview }) => {
-  const [stars, setStars] = useState(existingReview?.stars || 0);
-  const [text, setText] = useState(existingReview?.text || '');
+const ReviewForm = ({ itemId }) => {
+  const [text, setText] = useState('');
+  const [rating, setRating] = useState(0);
+
+  useEffect(() => {
+    setText(getReview(itemId));
+    setRating(getRating(itemId));
+  }, [itemId]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ stars, text });
+    saveReview(itemId, text);
+    saveRating(itemId, rating);
+    alert('Review & Rating saved!');
   };
 
   return (
-    <form onSubmit={handleSubmit} className="review-form">
-      <label>⭐ Your Rating:</label>
-      <select value={stars} onChange={(e) => setStars(Number(e.target.value))}>
-        {[0, 1, 2, 3, 4, 5].map(n => (
-          <option key={n} value={n}>{n} Star{n !== 1 && 's'}</option>
-        ))}
-      </select>
-
-      <label>📝 Your Review:</label>
+    <form onSubmit={handleSubmit}>
       <textarea
-        placeholder="Write your thoughts..."
         value={text}
         onChange={(e) => setText(e.target.value)}
+        placeholder="Write your review..."
       />
-
+      <div>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            style={{ cursor: 'pointer', color: star <= rating ? 'gold' : 'gray', fontSize: '20px' }}
+            onClick={() => setRating(star)}
+          >
+            ★
+          </span>
+        ))}
+      </div>
       <button type="submit">Save Review</button>
     </form>
   );
