@@ -1,24 +1,42 @@
+// src/App.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useParams } from 'react-router-dom';
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import AllMediaPage from './pages/AllMediaPage';
-import CreateCustomList from './pages/CreateCustomList';
 import CustomListViewer from './pages/CustomListViewer';
+import Navbar from './components/Navbar';
+import CreateCustomList from './pages/CreateCustomList';
+import PrivateRoute from './components/PrivateRoute';
 
-// Wrapper to extract :listName param and pass to CustomListViewer
-const CustomListViewerWrapper = () => {
-  const { listName } = useParams();
-  return <CustomListViewer listName={decodeURIComponent(listName)} />;
-};
-
-const App = () => (
-  <Router>
-    <Routes>
-      <Route path="/" element={<AllMediaPage />} />
-      <Route path="/create-list" element={<CreateCustomList />} />
-      <Route path="/view-list" element={<CustomListViewer />} />
-    </Routes>
-  </Router>
-);
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={
+            <PrivateRoute>
+            <AllMediaPage />
+            </PrivateRoute>
+            } />
+          <Route path="/custom-lists" element={
+            <PrivateRoute>
+            <CustomListViewer />
+            </PrivateRoute>
+            } />
+          <Route path="/create-list" element={
+            <PrivateRoute>
+            <CreateCustomList />
+            </PrivateRoute>
+            } />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
+}
 
 export default App;
