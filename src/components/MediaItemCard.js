@@ -1,31 +1,29 @@
-// src/components/MediaItemCard.js
 import React, { useState, useEffect } from 'react';
 import ReviewForm from './ReviewForm';
 import { getReview } from '../utils/reviews';
-import SkeletonReview from './SkeletonReview'; // ← import the skeleton
+import SkeletonReview from './SkeletonReview';
 import '../App.css';
 import '../styles/MediaItemCard.css';
 
 const MediaItemCard = ({ item }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [savedReview, setSavedReview] = useState('');
-  const [loadingReview, setLoadingReview] = useState(true); // ← new
+  const [loadingReview, setLoadingReview] = useState(true);
 
   useEffect(() => {
-    const fetchReview = () => {
-      const review = getReview(item.id);
+    const fetchReview = async () => {
+      const review = await getReview(item.id);
       if (review) {
         setSavedReview(review);
       }
-      setLoadingReview(false); // ← done loading
+      setLoadingReview(false);
     };
 
-    // Simulate async delay (optional but realistic UX)
-    setTimeout(fetchReview, 400); // 400ms fake delay
+    fetchReview(); // no delay needed anymore
   }, [item.id]);
 
-  const handleReviewSubmit = () => {
-    const newReview = getReview(item.id);
+  const handleReviewSubmit = async () => {
+    const newReview = await getReview(item.id);
     setSavedReview(newReview);
     setShowReviewForm(false);
   };

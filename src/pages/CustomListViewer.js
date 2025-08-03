@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getReview, getRating, saveReview, saveRating } from '../utils/reviews';
 import { searchMedia } from '../utils/mediaFetcher';
+import { auth } from '../firebase';
+import {
+  saveCustomList,
+  deleteCustomList,
+  getCustomLists,
+} from '../utils/firebaseUtils';
 
 const CustomListViewer = () => {
   const [savedLists, setSavedLists] = useState({});
@@ -9,39 +15,116 @@ const CustomListViewer = () => {
   const [reviewInputs, setReviewInputs] = useState({});
   const [ratingInputs, setRatingInputs] = useState({});
 
+  // NEW states to cache loaded reviews and ratings
+  const [reviews, setReviews] = useState({});
+  const [ratings, setRatings] = useState({});
+
   const [searchQuery, setSearchQuery] = useState('');
   const [mediaType, setMediaType] = useState('Movies');
   const [searchResults, setSearchResults] = useState([]);
 
+  const uid = auth.currentUser?.uid;
+
   useEffect(() => {
-    const lists = JSON.parse(localStorage.getItem('customLists') || '{}');
-    setSavedLists(lists);
-  }, []);
+    const loadLists = async () => {
+      const localLists = JSON.parse(localStorage.getItem('customLists') || '{}');
+      setSavedLists(localLists);
+
+      if (uid) {
+        try {
+          const cloudLists = await getCustomLists(uid);
+          const merged = { ...localLists };
+          cloudLists.forEach((list) => {
+            merged[list.name] = list.items || [];
+          });
+          setSavedLists(merged);
+          localStorage.setItem('customLists', JSON.stringify(merged));
+        } catch (e) {
+          console.error('Failed to load lists from Firestore:', e);
+        }
+      }
+    };
+    loadLists();
+  }, [uid]);
+
+  // NEW: load reviews & ratings when selectedList or savedLists change
+  useEffect(() => {
+    if (!selectedList) return;
+
+    const fetchReviewsRatings = async () => {
+      const items = savedLists[selectedList] || [];
+      const revs = {};
+      const rats = {};
+
+      for (const item of items) {
+        revs[item.id] = await getReview(item.id);
+        rats[item.id] = await getRating(item.id);
+      }
+
+      setReviews(revs);
+      setRatings(rats);
+    };
+
+    fetchReviewsRatings();
+  }, [selectedList, savedLists]);
+
+  const persistList = async (name, items) => {
+    const updated = {
+      ...savedLists,
+      [name]: items
+    };
+    setSavedLists(updated);
+    localStorage.setItem('customLists', JSON.stringify(updated));
+    if (uid) {
+      try {
+        await saveCustomList(uid, name.toLowerCase().replace(/\s+/g, '-'), {
+          name,
+          items,
+          updatedAt: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.error('Failed to save list to Firestore:', err);
+      }
+    }
+  };
 
   const handleSelectList = (listName) => {
     setSelectedList(listName);
     setEditingItemId(null);
   };
 
-  const handleDelete = (listName) => {
+  const handleDelete = async (listName) => {
     if (!window.confirm(`Delete list "${listName}"?`)) return;
     const updated = { ...savedLists };
     delete updated[listName];
     setSavedLists(updated);
     localStorage.setItem('customLists', JSON.stringify(updated));
     if (selectedList === listName) setSelectedList(null);
+
+    if (uid) {
+      try {
+        const listId = listName.toLowerCase().replace(/\s+/g, '-');
+        await deleteCustomList(uid, listId);
+      } catch (err) {
+        console.error('Failed to delete list from Firestore:', err);
+      }
+    }
   };
 
   const handleEdit = (itemId) => {
     setEditingItemId(itemId);
-    setReviewInputs({ ...reviewInputs, [itemId]: getReview(itemId) });
-    setRatingInputs({ ...ratingInputs, [itemId]: getRating(itemId) });
+    setReviewInputs({ ...reviewInputs, [itemId]: reviews[itemId] || '' });
+    setRatingInputs({ ...ratingInputs, [itemId]: ratings[itemId] || 0 });
   };
 
-  const handleSave = (itemId) => {
-    saveReview(itemId, reviewInputs[itemId]);
-    saveRating(itemId, ratingInputs[itemId]);
+  const handleSave = async (itemId) => {
+    await saveReview(itemId, reviewInputs[itemId]);
+    await saveRating(itemId, ratingInputs[itemId]);
     setEditingItemId(null);
+
+    // Update local cached reviews and ratings after save
+    setReviews((prev) => ({ ...prev, [itemId]: reviewInputs[itemId] }));
+    setRatings((prev) => ({ ...prev, [itemId]: ratingInputs[itemId] }));
   };
 
   const handleSearch = async () => {
@@ -50,26 +133,18 @@ const CustomListViewer = () => {
   };
 
   const handleAddToList = (item) => {
-    const updated = {
-      ...savedLists,
-      [selectedList]: [...savedLists[selectedList], {
-        id: item.id,
-        title: item.title,
-        image: item.image || null,
-        type: mediaType,
-      }]
-    };
-    setSavedLists(updated);
-    localStorage.setItem('customLists', JSON.stringify(updated));
+    const updatedItems = [...(savedLists[selectedList] || []), {
+      id: item.id,
+      title: item.title,
+      image: item.image || null,
+      type: mediaType,
+    }];
+    persistList(selectedList, updatedItems);
   };
 
   const handleRemoveFromList = (id) => {
-    const updated = {
-      ...savedLists,
-      [selectedList]: savedLists[selectedList].filter((i) => i.id !== id)
-    };
-    setSavedLists(updated);
-    localStorage.setItem('customLists', JSON.stringify(updated));
+    const updatedItems = savedLists[selectedList].filter((i) => i.id !== id);
+    persistList(selectedList, updatedItems);
   };
 
   const renderStars = (rating) => {
@@ -98,7 +173,7 @@ const CustomListViewer = () => {
               >
                 <strong>{name}</strong>
                 <br />
-                <small>{savedLists[name].length} items</small>
+                <small>{savedLists[name]?.length || 0} items</small>
                 <br />
                 <button
                   onClick={(e) => {
@@ -118,9 +193,9 @@ const CustomListViewer = () => {
               <h3>Items in "{selectedList}"</h3>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-                {savedLists[selectedList].map((item) => {
-                  const currentReview = getReview(item.id);
-                  const currentRating = getRating(item.id);
+                {savedLists[selectedList]?.map((item) => {
+                  const currentReview = reviews[item.id];
+                  const currentRating = ratings[item.id];
 
                   return (
                     <div
@@ -173,7 +248,7 @@ const CustomListViewer = () => {
                       ) : (
                         <>
                           <p><strong>Review:</strong> {currentReview || 'No review'}</p>
-                          <p><strong>Rating:</strong> {renderStars(currentRating)}</p>
+                          <p><strong>Rating:</strong> {renderStars(currentRating || 0)}</p>
                           <button onClick={() => handleEdit(item.id)}>Edit Review</button>
                         </>
                       )}

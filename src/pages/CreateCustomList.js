@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { searchMedia } from '../utils/mediaFetcher';
+import { auth } from '../firebase';
+import { saveCustomList } from '../utils/firebaseUtils'; // ✅ Firestore function
 
 const CreateCustomList = () => {
   const location = useLocation();
@@ -13,7 +15,6 @@ const CreateCustomList = () => {
   const [results, setResults] = useState([]);
   const [selectedItems, setSelectedItems] = useState([]);
 
-  // 🧠 On load: populate from existing list if editing
   useEffect(() => {
     if (editingList) {
       const savedLists = JSON.parse(localStorage.getItem('customLists') || '{}');
@@ -49,16 +50,34 @@ const CreateCustomList = () => {
     setSelectedItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!listName.trim()) return alert('List name required.');
     if (!selectedItems.length) return alert('Add at least one item.');
 
+    const uid = auth.currentUser?.uid;
+    if (!uid) return alert('Please log in.');
+
+    // LocalStorage update
     const savedLists = JSON.parse(localStorage.getItem('customLists') || '{}');
-    savedLists[listName] = selectedItems; // ✅ Overwrite only this list
+    savedLists[listName] = selectedItems;
     localStorage.setItem('customLists', JSON.stringify(savedLists));
 
-    alert(`List "${listName}" saved with ${selectedItems.length} item(s).`);
-    navigate('/'); // ✅ Optional: go back to homepage or lists
+    // Firestore update
+    const listId = listName.toLowerCase().replace(/\s+/g, '-');
+    const listData = {
+      name: listName,
+      items: selectedItems,
+      updatedAt: new Date().toISOString(),
+    };
+
+    try {
+      await saveCustomList(uid, listId, listData);
+      alert(`✅ List "${listName}" saved to Firestore.`);
+      navigate('/');
+    } catch (err) {
+      console.error('❌ Firestore save error:', err);
+      alert('Failed to save list to Firestore.');
+    }
   };
 
   return (
@@ -70,7 +89,7 @@ const CreateCustomList = () => {
         placeholder="List Name"
         value={listName}
         onChange={(e) => setListName(e.target.value)}
-        disabled={!!editingList} // Prevent renaming during edit
+        disabled={!!editingList}
         style={{ marginBottom: '10px' }}
       />
 
