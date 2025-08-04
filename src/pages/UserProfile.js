@@ -33,7 +33,7 @@ const UserProfile = () => {
   const handleSave = async () => {
     // Ensure we only save fields with non-empty values
     const updates = {};
-    if (profile.username.trim()) updates.username = profile.username.trim();
+    if (profile.username.trim()) updates.username = profile.username.trim().toLowerCase();
     if (profile.bio.trim()) updates.bio = profile.bio.trim();
 
     // Update Firestore with the new data

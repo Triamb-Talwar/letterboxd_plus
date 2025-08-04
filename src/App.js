@@ -10,6 +10,7 @@ import Navbar from './components/Navbar';
 import CreateCustomList from './pages/CreateCustomList';
 import PrivateRoute from './components/PrivateRoute';
 import UserProfile from './pages/UserProfile';
+import PublicProfile from './pages/PublicProfle';
 
 import { auth } from './firebase';
 import { saveUserProfile, getUserProfile } from './utils/firebaseUtils';
@@ -76,6 +77,7 @@ function App() {
             }/>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/user/:username" element={<PublicProfile />} />
         </Routes>
       </Router>
     </AuthProvider>
