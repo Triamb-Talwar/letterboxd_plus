@@ -1,4 +1,3 @@
-// src/context/AuthContext.js
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase'; // your configured firebase auth instance
@@ -18,7 +17,10 @@ export const AuthProvider = ({ children }) => {
     return () => unsub();
   }, []);
 
-  const logout = () => signOut(auth);
+  const logout = async () => {
+    await signOut(auth);
+    localStorage.clear(); // ✅ Clears stored lists/reviews etc. from previous users
+  };
 
   return (
     <AuthContext.Provider value={{ user, logout }}>
