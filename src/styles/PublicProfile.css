@@ -1,0 +1,43 @@
+/* styles/PublicProfile.css */
+
+.public-profile-container {
+  padding: 20px;
+}
+
+.profile-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.user-lists {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.list-container {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  width: 300px;
+  background-color: #f9f9f9;
+}
+
+.list-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.media-item {
+  margin-bottom: 10px;
+}
+
+.media-item img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover; /* Ensures consistent size for both portrait and landscape */
+  border-radius: 6px;
+}

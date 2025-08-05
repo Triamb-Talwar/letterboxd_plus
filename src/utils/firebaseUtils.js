@@ -8,7 +8,22 @@ import {
 // 🔧 Save user profile to Firestore
 export const saveUserProfile = async (uid, data) => {
   const ref = doc(db, 'users', uid);
-  await setDoc(ref, data, { merge: true });
+
+  // If username not present, create one from name or email
+  const username =
+    data.username ||
+    data.name?.toLowerCase().replace(/\s+/g, '') ||
+    data.email.split('@')[0];
+
+  await setDoc(
+    ref,
+    {
+      ...data,
+      username,
+      updatedAt: new Date().toISOString(),
+    },
+    { merge: true }
+  );
 };
 
 // 🔍 Fetch user profile from Firestore

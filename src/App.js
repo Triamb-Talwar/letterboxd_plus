@@ -10,7 +10,7 @@ import Navbar from './components/Navbar';
 import CreateCustomList from './pages/CreateCustomList';
 import PrivateRoute from './components/PrivateRoute';
 import UserProfile from './pages/UserProfile';
-import PublicProfile from './pages/PublicProfle';
+import PublicProfile from './pages/PublicProfile';
 
 import { auth } from './firebase';
 import { saveUserProfile, getUserProfile } from './utils/firebaseUtils';

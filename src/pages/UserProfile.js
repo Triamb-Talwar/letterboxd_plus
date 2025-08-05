@@ -105,6 +105,15 @@ const UserProfile = () => {
         <>
           <p><strong>Username:</strong> {profile.username}</p>
           <p><strong>Bio:</strong> {profile.bio}</p>
+          <button
+          onClick={() => {
+            const url = `${window.location.origin}/user/${profile.username}`;
+            navigator.clipboard.writeText(url);
+            alert('Profile link copied to clipboard!');
+            }}
+            style={{ marginTop: 10 }}>
+            Share Profile
+          </button>
           <button onClick={() => setEditing(true)} style={{ marginRight: 10 }}>Edit</button>
           <button onClick={handleDelete}>Delete Account</button>
         </>
