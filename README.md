@@ -4,12 +4,6 @@ Your personalized media tracker — built with React, Firebase Auth, and TMDB AP
 
 🌐 **Live Demo:** [letterboxplus.netlify.app](https://letterboxplus.netlify.app)
 
-## 🖼 Preview
-
-![App Screenshot](https://your-screenshot-link-here.png)
-
----
-
 ## 🚀 Features
 
 - 🔍 Search and explore movies using TMDB API
