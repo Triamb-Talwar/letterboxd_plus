@@ -64,24 +64,6 @@ Contributions welcome! Here's how to get started:
 
 ---
 
-## 🌟 How to Get More Stars
-
-- Add a catchy tagline and project preview (GIF or screenshot) at the top.
-- Use relevant GitHub tags: `react`, `firebase`, `tmdb`, `letterboxd-clone`, `media-tracker`, `open-source`.
-- Share your project on Twitter, Reddit (`r/reactjs`, `r/opensource`), and developer communities.
-- Add a **Live Demo** section to your README.
-- Label beginner-friendly issues as “good first issue.”
-- Add a **Contributors** section to encourage forks and collaboration.
-
----
-
-## 🏷 GitHub Tags to Add
-
-```txt
-react, firebase, tmdb, media-tracker, letterboxd-clone, open-source
-```
-
----
 
 ## 📄 License
 
